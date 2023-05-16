@@ -8,4 +8,7 @@ module.exports = {
   rules: {
     'import/extensions': 'off',
   },
+  parserOptions: {
+    ecmaVersion: 13,
+  },
 };
