@@ -1,0 +1,61 @@
+.difficult-menu {
+  position: relative;
+  display: flex;
+  width: 8em;
+  height: 3em;
+  &:after {
+    content: "";
+    background: url("/minesweeper/img/arrow.svg") center/50% no-repeat;
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 15%;
+    background-color: lighten(#3d3c3c, 10%);
+    transition: .25s all ease;
+    pointer-events: none;
+  }
+  &__select {
+    flex: 1;
+    appearance: none;
+    box-shadow: none;
+    border: none;
+    padding: 0 1em;
+    color: #fff;
+    background-color: #3d3c3c;
+    cursor: pointer;
+  }
+
+  &__option {
+  }
+}
+// .difficult-menu {
+
+//   &__select {
+//     position: relative;
+//     // display: flex;
+//     // width: 20em;
+//     // height: 3em;
+//     // border-radius: .25em;
+//     // overflow: hidden;
+//     appearance: none;
+//     // padding: 0 1em;
+//     // color: #fff;
+//     // background-color: #525050;
+//     cursor: pointer;
+//     &:after {
+//       content: "";
+//       position: absolute;
+//       top: 0;
+//       right: 0;
+//       background-color: red;
+//       color: red;
+//       height: 10px;
+//       width: 10px;
+//       // pointer-events: none;
+//     }
+//   }
+
+//   &__option {
+//   }
+// }

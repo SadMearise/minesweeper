@@ -1,0 +1,345 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
+:root {
+  --index: calc(1vh + 1vw);
+  --fontFamily: "Poppins", sans-serif;
+}
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+:focus, :active {
+  outline: none;
+}
+
+a:focus, a:active {
+  outline: none;
+}
+
+nav, footer, header, aside {
+  display: block;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  font-size: 100%;
+  line-height: 1;
+  font-family: var(--fontFamily);
+}
+
+input, button, textarea {
+  font-family: var(--fontFamily);
+}
+
+input::-ms-clear {
+  display: none;
+}
+
+button {
+  cursor: pointer;
+  background-color: transparent;
+}
+
+a, a:visited, a:hover {
+  text-decoration: none;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+img {
+  vertical-align: top;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: inherit;
+  font-weight: var(--fw-400);
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: "";
+  content: none;
+}
+
+body {
+  color: #fff;
+  background-color: #666;
+}
+
+.page {
+  width: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+@media (max-width: 79.99875em) {
+  .container {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+}
+@media (max-width: 47.99875em) {
+  .container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+.header__body {
+  display: flex;
+  align-items: center;
+  padding: 30px 0;
+}
+.header__control-panel {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-left: auto;
+}
+
+.footer {
+  margin-top: auto;
+  text-align: center;
+  padding: 30px 0;
+}
+.footer__copy {
+  font-size: 18px;
+}
+
+.app {
+  display: flex;
+  gap: 5%;
+}
+.app__col {
+  flex: 0 1 50%;
+}
+.app__description {
+  text-align: justify;
+}
+.app__minesweeper {
+  margin: 0 auto;
+}
+
+.minesweeper {
+  width: -moz-fit-content;
+  width: fit-content;
+}
+.minesweeper__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.board__row {
+  display: flex;
+}
+.board__row:first-child .board__cell {
+  border-top: 1px solid black;
+}
+.cell {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  background-color: rgb(148, 102, 185);
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+}
+.cell:first-child {
+  border-left: 1px solid black;
+}
+.cell_opened {
+  background-color: #ac89c9;
+}
+.cell_flag {
+  background: rgb(148, 102, 185) url("/minesweeper/img/flag.svg") center/80% no-repeat;
+}
+.cell_mine {
+  background: rgb(148, 102, 185) url("/minesweeper/img/mine.svg") center/80% no-repeat;
+}
+.cell_count-mines_1 {
+  color: red;
+}
+.cell_count-mines_2 {
+  color: blue;
+}
+.cell_count-mines_3 {
+  color: green;
+}
+.cell_count-mines_4 {
+  color: yellow;
+}
+.cell_count-mines_5 {
+  color: orange;
+}
+.cell_count-mines_6 {
+  color: purple;
+}
+.cell_count-mines_7 {
+  color: rgb(67, 179, 194);
+}
+.cell_count-mines_8 {
+  color: chartreuse;
+}
+
+.leaderboard-list__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.counter {
+  position: relative;
+}
+.counter_steps::after {
+  content: "";
+  background: url("/minesweeper/img/steps.svg") center/contain no-repeat;
+  position: absolute;
+  height: 25px;
+  width: 25px;
+  -o-object-fit: contain;
+     object-fit: contain;
+  top: 50%;
+  right: 0;
+  transform: translate(calc(100% + 5px), -50%);
+}
+.counter_timer::before {
+  content: "";
+  background: url("/minesweeper/img/timer.svg") center/contain no-repeat;
+  position: absolute;
+  height: 25px;
+  width: 25px;
+  -o-object-fit: contain;
+     object-fit: contain;
+  top: 50%;
+  left: 0;
+  transform: translate(calc(-100% - 5px), -50%);
+}
+
+.difficult-menu {
+  position: relative;
+  display: flex;
+  width: 8em;
+  height: 3em;
+}
+.difficult-menu:after {
+  content: "";
+  background: url("/minesweeper/img/arrow.svg") center/50% no-repeat;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 15%;
+  background-color: #575555;
+  transition: 0.25s all ease;
+  pointer-events: none;
+}
+.difficult-menu__select {
+  flex: 1;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  box-shadow: none;
+  border: none;
+  padding: 0 1em;
+  color: #fff;
+  background-color: #3d3c3c;
+  cursor: pointer;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 70px;
+  height: 32px;
+}
+.switch__input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.switch__input:checked + .switch__label {
+  background-color: #2196f3;
+}
+.switch__input:checked + .switch__label:before {
+  transform: translate(calc(100% - 5px), -50%);
+  background: white url("/minesweeper/img/day.png") center/contain no-repeat;
+}
+.switch__label {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.3s;
+  border-radius: 16px;
+}
+.switch__label:before {
+  content: "";
+  position: absolute;
+  background: white url("/minesweeper/img/night.png") center/100% no-repeat;
+  -o-object-fit: contain;
+     object-fit: contain;
+  height: 38px;
+  width: 38px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  transition: 0.3s;
+  box-shadow: 0 0px 15px rgba(32, 32, 32, 0.2392156863);
+  border-radius: 50%;
+}
+
+.light {
+  background-color: #fff;
+}

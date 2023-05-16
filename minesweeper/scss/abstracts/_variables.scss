@@ -1,0 +1,23 @@
+:root {
+  --index: calc(1vh + 1vw);
+	--fontFamily: "Poppins", sans-serif;
+}
+
+$containerWidth: 1200;
+
+$containerPaddingDefault: 80;
+$containerSidePaddingDefault: math.div($containerPaddingDefault, 2);
+
+$containerPaddingL: 60;
+$containerSidePaddingM: math.div($containerPaddingL, 2);
+
+$containerPaddingM: 20;
+$containerSidePaddingXS: math.div($containerPaddingM, 2);
+
+$breakpoint1280: 1279.98;
+$breakpoint992: 991.98;
+$breakpoint768: 767.98;
+$breakpoint576: 575.98;
+$breakpoint360: 359.98;
+$breakpoint320: 319.98;
+$defaultFZ: 10;

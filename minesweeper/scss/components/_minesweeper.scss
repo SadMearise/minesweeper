@@ -1,0 +1,15 @@
+.minesweeper {
+  width: fit-content;
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  &__board {
+  }
+
+  &__button {
+  }
+}

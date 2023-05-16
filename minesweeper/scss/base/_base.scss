@@ -1,0 +1,28 @@
+body {
+  color: #fff;
+  background-color: #666;
+}
+
+.page {
+	width: 100%;
+	min-height: 100%;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+
+.container {
+	max-width: ($containerWidth + $containerPaddingDefault) + px;
+	width: 100%;
+	margin: 0 auto;
+	padding: 0 ($containerSidePaddingDefault + px);
+
+	@media (max-width: em($breakpoint1280)) {
+		padding-left: ($containerSidePaddingM + px);
+		padding-right: ($containerSidePaddingM + px);
+	}
+	@media (max-width: em($breakpoint768)) {
+		padding-left: ($containerSidePaddingXS + px);
+		padding-right: ($containerSidePaddingXS + px);
+	}
+}

@@ -1,0 +1,14 @@
+.header {
+  &__body {
+    display: flex;
+    align-items: center;
+    padding: 30px 0;
+  }
+
+  &__control-panel {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-left: auto;
+  }
+}

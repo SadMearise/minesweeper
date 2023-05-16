@@ -1,0 +1,11 @@
+.board {
+  &__row {
+    display: flex;
+    &:first-child .board__cell {
+      border-top: 1px solid black;
+    }
+  }
+  &__cell {
+    
+  }
+}

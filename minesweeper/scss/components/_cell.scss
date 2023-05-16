@@ -1,0 +1,53 @@
+.cell {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  background-color: rgb(148, 102, 185);
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+  &:first-child {
+    border-left: 1px solid black;
+  }
+
+  &_opened {
+    background-color: lighten(rgb(148, 102, 185), 10%);
+  }
+
+  &_flag {
+    background: rgb(148, 102, 185) url("/minesweeper/img/flag.svg") center/80% no-repeat;
+  }
+
+  &_mine {
+    background: rgb(148, 102, 185) url("/minesweeper/img/mine.svg") center/80% no-repeat;
+  }
+
+  &_count-mines {
+    &_1 {
+      color: red;
+    }
+    &_2 {
+      color: blue;
+    }
+    &_3 {
+      color: green;
+    }
+    &_4 {
+      color: yellow;
+    }
+    &_5 {
+      color: orange;
+    }
+    &_6 {
+      color: purple;
+    }
+    &_7 {
+      color: rgb(67, 179, 194);
+    }
+    &_8 {
+      color: chartreuse;
+    }
+  }
+
+}

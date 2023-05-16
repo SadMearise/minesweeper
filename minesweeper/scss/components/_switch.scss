@@ -1,0 +1,47 @@
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 70px;
+  height: 32px;
+  &__input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    &:checked + .switch__label {
+      background-color: #2196f3;
+    }
+    &:checked + .switch__label:before {
+      transform: translate(calc(100% - 5px), -50%);
+      background: white url("/minesweeper/img/day.png") center/contain no-repeat;
+    }
+  }
+
+  &__label {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.3s;
+    border-radius: 16px;
+    &:before {
+      content: "";
+      position: absolute;
+      background: white url("/minesweeper/img/night.png") center/100% no-repeat;
+      object-fit: contain;
+      height: 38px;
+      width: 38px;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      transition: 0.3s;
+      box-shadow: 0 0px 15px #2020203d;
+      border-radius: 50%;
+    }
+  }
+}

@@ -1,0 +1,14 @@
+.leaderboard-list {
+  
+  &__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__nickname {
+  }
+
+  &__score {
+  }
+}

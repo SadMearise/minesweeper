@@ -1,0 +1,31 @@
+@use "sass:math";
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+@import 
+  "abstracts/functions", 
+  "abstracts/variables";
+
+@import
+  'base/reset',
+  'base/base';
+
+@import
+  'layout/header',
+  'layout/footer';
+
+@import
+  'components/app',
+  'components/minesweeper',
+  'components/board',
+  'components/cell',
+  'components/leaderboard-list',
+  'components/counter',
+  'components/difficult',
+  'components/switch';
+
+@import
+  'pages/home';
+
+@import
+  'themes/light';
