@@ -16,7 +16,9 @@ export default class Minesweeper {
   }
 
   getStructure() {
-    const structure = {};
+    const structure = {
+      component: '',
+    };
 
     for (let i = 0; i < this.lines; i += 1) {
       const row = new BaseComponent({ classNames: ['board__row'] });
@@ -27,23 +29,48 @@ export default class Minesweeper {
         structure[`row${i}`][`cell${j}`] = { component: cell };
       }
     }
+
     return structure;
   }
 
+  endGame() { // lose or win option
+    console.log('end game');
+  }
+
+  getCountMinesAroundCell() {
+    const fullBoard = [];
+    console.log(this.mines);
+
+    for (let i = 0; i < this.lines; i += 1) {
+      fullBoard.push([]);
+      for (let j = 0; j < this.lines; j += 1) {
+        if (this.mines.includes(`${i}-${j}`)) fullBoard[i].push(1);
+        else fullBoard[i].push(0);
+      }
+    }
+    console.log(fullBoard);
+  }
+
   getMines() {
-    for (let i = 0; i < 25; i += 1) {
-      this.#pushIndexes();
+    for (let i = 0; i < this.countMines; i += 1) {
+      const ind = this.#getPairIndexes();
+      this.mines.push(ind);
     }
 
     return this.mines;
   }
 
-  #pushIndexes() {
+  replaceMine(index) {
+    this.mines[index] = this.#getPairIndexes();
+  }
+
+  #getPairIndexes() {
     const i = randomIndex(this.lines);
     const j = randomIndex(this.lines);
     const index = `${i}-${j}`;
 
-    if (this.mines.includes(index)) this.#pushIndexes();
-    else this.mines.push(index);
+    if (this.mines.includes(index)) return this.#getPairIndexes();
+
+    return index;
   }
 }
