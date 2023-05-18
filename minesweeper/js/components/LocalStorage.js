@@ -6,4 +6,8 @@ export default class LocalStorage {
   static getLocalStorage(title) {
     return JSON.parse(localStorage.getItem(title));
   }
+
+  static checkLocalStorage(title) {
+    return localStorage.getItem(title);
+  }
 }

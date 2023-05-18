@@ -1,15 +1,15 @@
 export default class BaseComponent {
   constructor({
-    tagName = 'div', classNames = [], textContent = '', attributes = [], parentNode,
+    tagName = 'div', classNames = [], textContent = '', attributes = {}, parentNode,
   }) {
     this.node = undefined;
-    this.node = document.createElement(tagName);
+    this.node = document.createElement(tagName.toLowerCase());
     this.node.classList.add(...classNames);
     this.node.textContent = textContent;
 
     const keys = Object.keys(attributes);
     for (let i = 0; i < keys.length; i += 1) {
-      this.node.setAttribute(keys[0], attributes[keys[0]]);
+      this.node.setAttribute(keys[i], attributes[keys[i]]);
     }
 
     if (parentNode) {
@@ -33,6 +33,10 @@ export default class BaseComponent {
 
   addClass(className) {
     this.node.classList.add(className);
+  }
+
+  removeClass(className) {
+    this.node.classList.remove(className);
   }
 
   destroy() {
