@@ -1,8 +1,8 @@
 export default class BaseComponent {
   constructor({
     tagName = 'div', classNames = [], textContent = '', attributes = {}, parentNode,
-  }) {
-    this.node = undefined;
+  } = {}) {
+    this.node = null;
     this.node = document.createElement(tagName.toLowerCase());
     this.node.classList.add(...classNames);
     this.node.textContent = textContent;
@@ -19,6 +19,10 @@ export default class BaseComponent {
 
   append(child) {
     this.node.append(child.getNode());
+  }
+
+  after(child) {
+    this.node.after(child.getNode());
   }
 
   appendChildren(children) {

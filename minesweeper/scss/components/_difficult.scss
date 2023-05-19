@@ -1,8 +1,8 @@
 .difficult-menu {
   position: relative;
   display: flex;
-  width: 8em;
-  height: 3em;
+  width: 5em;
+  height: 2em;
   &:after {
     content: "";
     background: url("/minesweeper/img/arrow.svg") center/50% no-repeat;
@@ -20,7 +20,7 @@
     appearance: none;
     box-shadow: none;
     border: none;
-    padding: 0 1em;
+    padding: 0 .5em;
     color: #fff;
     background-color: #3d3c3c;
     cursor: pointer;

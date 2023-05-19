@@ -1,30 +1,27 @@
 import BaseComponent from './BaseComponent.js';
-import { randomIndex, convertPositionToArr } from '../files/functions.js';
+import { randomIndex, convertPositionToArr, initDOM } from '../files/functions.js';
 
 export default class Minesweeper {
-  constructor({ countMines = 0, difficult = 'easy' }) {
-    this.difficult = difficult;
-    this.countMines = countMines;
-    if (this.difficult === 'easy') this.lines = 7; // изменить на 10
-    else if (this.difficult === 'medium') this.lines = 15;
-    else if (this.difficult === 'hard') this.lines = 25;
-
+  constructor({ countMines = 0, difficult = 'easy' } = {}) {
     this.minesweeper = {
+      timer: 0,
+      steps: 0,
       difficult,
-      countMines: countMines === 0 ? this.lines : 0,
+      countMines,
       mines: [],
       board: {},
     };
+
+    if (this.minesweeper.difficult === 'easy') this.lines = 7; // изменить на 10
+    else if (this.minesweeper.difficult === 'medium') this.lines = 15;
+    else if (this.minesweeper.difficult === 'hard') this.lines = 25;
+
+    this.minesweeper.countMines = countMines === 0 ? this.lines : 0;
   }
 
-  getMinesweeperObj() {
-    return this.minesweeper;
-  }
-
+  // возможно нужно перенести в App
   getStructure() {
-    const structure = {
-      component: '',
-    };
+    const structure = {};
 
     for (let x = 0; x < this.lines; x += 1) {
       const row = new BaseComponent({ classNames: ['board__row'] });
@@ -48,8 +45,34 @@ export default class Minesweeper {
     return structure;
   }
 
-  endGame() {
-    console.log('end game', this.countMines);
+  getMinesweeperObj() {
+    return this.minesweeper;
+  }
+
+  getMines() {
+    for (let i = 0; i < this.minesweeper.countMines; i += 1) {
+      const index = this.#getPairIndexes();
+
+      this.minesweeper.mines.push(index);
+    }
+
+    this.#addInfoAboutMinesToCells();
+    return this.minesweeper.mines;
+  }
+
+  replaceMine(index) {
+    const [oldMineX, oldMineY] = convertPositionToArr(this.minesweeper.mines[index]);
+
+    this.minesweeper.board[`row${oldMineX}`][`cell${oldMineY}`].mine = false;
+
+    const newMinePosition = this.#getPairIndexes();
+    const [newMineX, newMineY] = convertPositionToArr(newMinePosition);
+
+    this.minesweeper.board[`row${newMineX}`][`cell${newMineY}`].mine = true;
+
+    this.minesweeper.mines[index] = newMinePosition;
+    console.log('minesweeper.mines after replaces', this.minesweeper.mines);
+    this.#addInfoAboutMinesToCells();
   }
 
   clickCell(structure, x, y) {
@@ -58,6 +81,8 @@ export default class Minesweeper {
     if (this.minesweeper.board[`row${x}`][`cell${y}`].visited) return;
 
     const node = structure[`row${x}`][`cell${y}`].component.getNode();
+
+    if (node.classList.contains('cell_flag')) node.classList.remove('cell_flag');
 
     if (!mine && minesAround > 0) {
       this.minesweeper.board[`row${x}`][`cell${y}`].visited = true;
@@ -78,6 +103,7 @@ export default class Minesweeper {
     if (minesAround > 0) {
       const node = structure[`row${x}`][`cell${y}`].component.getNode();
 
+      if (node.classList.contains('cell_flag')) node.classList.remove('cell_flag');
       node.classList.add('cell_opened', `cell_count-mines_${minesAround}`);
       node.innerHTML = minesAround;
 
@@ -96,6 +122,59 @@ export default class Minesweeper {
       if (y > 0 && x < this.lines - 1) this.clickCell(structure, x + 1, y - 1);
       if (x > 0 && y < this.lines - 1) this.clickCell(structure, x - 1, y + 1);
     }, 10);
+  }
+
+  startTimer(timerComponent) {
+    if (this.minesweeper.timer >= 999) this.endGame('end time');
+    else {
+      const timerNode = timerComponent.getNode();
+
+      this.minesweeper.timer += 1;
+
+      const timerLength = `${this.minesweeper.timer}`.length;
+      let text = '';
+      if (timerLength === 1) text = '00';
+      if (timerLength === 2) text = '0';
+
+      timerNode.innerHTML = `${text}${this.minesweeper.timer}`;
+    }
+  }
+
+  static stopTimer(timer) {
+    window.clearInterval(timer);
+  }
+
+  resetTimer(timerComponent) {
+    const timerNode = timerComponent.getNode();
+
+    this.minesweeper.timer = 0;
+    timerNode.innerHTML = `00${this.minesweeper.timer}`;
+  }
+
+  stepCounter(counterComponent) {
+    const counterNode = counterComponent.getNode();
+    this.minesweeper.steps += 1;
+
+    const counterLength = `${this.minesweeper.steps}`.length;
+    let text = '';
+    if (counterLength === 1) text = '00';
+    if (counterLength === 2) text = '0';
+
+    counterNode.innerHTML = `${text}${this.minesweeper.steps}`;
+  }
+
+  static endGame(cause, timer) {
+    Minesweeper.stopTimer(timer);
+  }
+
+  newGame() {
+    this.minesweeper.timer = 0;
+    this.minesweeper.steps = 0;
+    this.minesweeper.mines = [];
+    this.minesweeper.board = [];
+
+    const structure = this.getStructure();
+    return structure;
   }
 
   #getMineInCell(x, y) {
@@ -137,33 +216,7 @@ export default class Minesweeper {
         if (!this.minesweeper.board[`row${x}`][`cell${y}`].mine) this.minesweeper.board[`row${x}`][`cell${y}`].minesAround = mines;
       }
     }
-  }
-
-  getMines() {
-    for (let i = 0; i < this.minesweeper.countMines; i += 1) {
-      const index = this.#getPairIndexes();
-
-      this.minesweeper.mines.push(index);
-    }
-
-    this.#addInfoAboutMinesToCells();
-
-    return this.minesweeper.mines;
-  }
-
-  replaceMine(index) {
-    const [oldMineX, oldMineY] = convertPositionToArr(this.minesweeper.mines[index]);
-
-    this.minesweeper.board[`row${oldMineX}`][`cell${oldMineY}`].mine = false;
-
-    const newMinePosition = this.#getPairIndexes();
-    const [newMineX, newMineY] = convertPositionToArr(newMinePosition);
-
-    this.minesweeper.board[`row${newMineX}`][`cell${newMineY}`].mine = true;
-
-    this.minesweeper.mines[index] = newMinePosition;
-
-    this.#addInfoAboutMinesToCells();
+    console.log('minesweeper.board', this.minesweeper.board);
   }
 
   #getPairIndexes() {

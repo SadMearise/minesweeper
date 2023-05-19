@@ -1,5 +1,7 @@
 .minesweeper {
-  width: fit-content;
+  width: 70%;
+  display: flex;
+  flex-direction: column;
   &__header {
     display: flex;
     align-items: center;
@@ -8,8 +10,12 @@
   }
 
   &__board {
+    margin: 0 auto;
+    margin-bottom: 20px;
   }
 
   &__button {
+    width: fit-content;
+    margin: 0 auto;
   }
 }

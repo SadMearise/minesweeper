@@ -1,6 +1,9 @@
 body {
   color: #fff;
   background-color: #666;
+  &.lock {
+    overflow: hidden;
+  }
 }
 
 .page {

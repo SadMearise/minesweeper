@@ -1,0 +1,13 @@
+.btn {
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  padding: 4px 13px;
+  background-color: transparent;
+  border: 1px solid black;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: 0.3s;
+  cursor: pointer;
+  user-select: none;
+}
