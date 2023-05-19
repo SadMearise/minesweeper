@@ -1,25 +1,8 @@
 import BaseComponent from './BaseComponent.js';
-import { randomIndex } from '../files/functions.js';
+import { randomIndex, convertPositionToArr } from '../files/functions.js';
 
 export default class Minesweeper {
   constructor({ countMines = 0, difficult = 'easy' }) {
-    // this.obj = {
-    //   moves: 999,
-    //   timer: 999,
-    //   difficult: this.difficult,
-    //   countMines: 0,
-    //   gameStatus: '', // end/start/game
-    //   board: {
-    //     row0: {
-    //       cell0: {
-    //         flag: false,
-    //         mine: false,
-    //         minesAround: 3,
-    //         visited: false
-    //       },
-    //     },
-    //   },
-    // };
     this.difficult = difficult;
     this.countMines = countMines;
     if (this.difficult === 'easy') this.lines = 7; // изменить на 10
@@ -30,13 +13,12 @@ export default class Minesweeper {
       difficult,
       countMines: countMines === 0 ? this.lines : 0,
       mines: [],
-      board: [],
-      detailedBoard: {
-
-      },
+      board: {},
     };
-    // возможно нужно будет создать метод по получению этого объекта
-    // для передачи его в ls
+  }
+
+  getMinesweeperObj() {
+    return this.minesweeper;
   }
 
   getStructure() {
@@ -44,19 +26,21 @@ export default class Minesweeper {
       component: '',
     };
 
-    for (let i = 0; i < this.lines; i += 1) {
+    for (let x = 0; x < this.lines; x += 1) {
       const row = new BaseComponent({ classNames: ['board__row'] });
-      structure[`row${i}`] = { component: row };
-      this.minesweeper.detailedBoard[`row${i}`] = {};
-      for (let j = 0; j < this.lines; j += 1) {
-        const cell = new BaseComponent({ classNames: ['board__cell', 'cell'], attributes: { 'data-pos': `${i}-${j}` } });
-        structure[`row${i}`][`cell${j}`] = { component: cell };
 
-        this.minesweeper.detailedBoard[`row${i}`][`cell${j}`] = {
+      structure[`row${x}`] = { component: row };
+      this.minesweeper.board[`row${x}`] = {};
+      for (let y = 0; y < this.lines; y += 1) {
+        const cell = new BaseComponent({ classNames: ['board__cell', 'cell'], attributes: { 'data-pos': `${x}-${y}` } });
+
+        structure[`row${x}`][`cell${y}`] = { component: cell };
+
+        this.minesweeper.board[`row${x}`][`cell${y}`] = {
           flag: false,
           mine: false,
           visited: false,
-          minesAround: 0,
+          minesAround: false,
         };
       }
     }
@@ -64,110 +48,65 @@ export default class Minesweeper {
     return structure;
   }
 
-  static endGame() { // lose or win option
-    console.log('end game');
+  endGame() {
+    console.log('end game', this.countMines);
   }
 
-  // дописать 2 метода. При открытии клеток нужно проверять все соседние ячейки.
-  // Если:
-  // Соседняя ячейка пустая, то добавляем её индекс в рекурсию
-  // Соседняя ячейка имеет число, то выводим его
-  // Так же нужно добавить стек с уже посешёнными ячейками
-  // Выход из функции осуществляем когда стек очищается
-  // clickCell(x, y) { // tile
-  //   if (tile.classList.contains('tile--checked') || tile.classList.contains('tile--flagged')) return;
+  clickCell(structure, x, y) {
+    const { minesAround, mine } = this.minesweeper.board[`row${x}`][`cell${y}`];
 
-  //   const position = `${x}-${y}`;
+    if (this.minesweeper.board[`row${x}`][`cell${y}`].visited) return;
 
-  //   let num = this.minesweeper.board[x][y];
-  //   if (num !== 9 && num !== 0) {
-  //     tile.classList.add('tile--checked');
-  //     // тут добавить класс для открытия ячейки
-  //     return;
-  //   }
+    const node = structure[`row${x}`][`cell${y}`].component.getNode();
 
-  //   checkCells(structure, position);
-  //   }
-  //   tile.classList.add('tile--checked');
-  // }
+    if (!mine && minesAround > 0) {
+      this.minesweeper.board[`row${x}`][`cell${y}`].visited = true;
+      node.classList.add('cell_opened', `cell_count-mines_${minesAround}`);
+      node.innerHTML = minesAround;
+      return;
+    }
 
-  // checkCells(structure, position) {
-  //   const cellPos = position.split('-');
-  //   const x = cellPos[0];
-  //   const y = cellPos[cellPos.length - 1];
+    this.checkCells(structure, x, y);
 
-  //   /* check nearby tiles */
-  //   if (x > 0) {
-  //     clickTile(x-1, y);
-  //   }
-  //   // if (x < this.lines - 1) {
-  //   //   let targetE = document.querySelectorAll(`[data-tile="${x+1},${y}"`)[0];
-  //   //   clickTile(targetE, `${x+1},${y}`);
-  //   // }
-  //   // if (y > 0) {
-  //   //   let targetN = document.querySelectorAll(`[data-tile="${x},${y-1}"]`)[0];
-  //   //   clickTile(targetN, `${x},${y-1}`);
-  //   // }
-  //   // if (y < this.lines - 1) {
-  //   //   let targetS = document.querySelectorAll(`[data-tile="${x},${y+1}"]`)[0];
-  //   //   clickTile(targetS, `${x},${y+1}`);
-  //   // }
+    this.minesweeper.board[`row${x}`][`cell${y}`].visited = true;
+    node.classList.add('cell_opened');
+  }
 
-  //   // if (x > 0 && y > 0) {
-  //   //   let targetNW = document.querySelectorAll(`[data-tile="${x-1},${y-1}"`)[0];
-  //   //   clickTile(targetNW, `${x-1},${y-1}`);
-  //   // }
-  //   // if (x < this.lines - 1 && y < this.lines - 1) {
-  //   //   let targetSE = document.querySelectorAll(`[data-tile="${x+1},${y+1}"`)[0];
-  //   //   clickTile(targetSE, `${x+1},${y+1}`);
-  //   // }
+  checkCells(structure, x, y) {
+    const { minesAround } = this.minesweeper.board[`row${x}`][`cell${y}`];
 
-  //   // if (y > 0 && x < this.lines - 1) {
-  //   //   let targetNE = document.querySelectorAll(`[data-tile="${x+1},${y-1}"]`)[0];
-  //   //   clickTile(targetNE, `${x+1},${y-1}`);
-  //   // }
-  //   // if (x > 0 && y < this.lines - 1) {
-  //   //   let targetSW = document.querySelectorAll(`[data-tile="${x-1},${y+1}"`)[0];
-  //   //   clickTile(targetSW, `${x-1},${y+1}`);
-  //   // }
+    if (minesAround > 0) {
+      const node = structure[`row${x}`][`cell${y}`].component.getNode();
 
-  //   // сделать проверку на то, куда мы кликнули, на пустую клетку или клетку с цифрой
-  // }
+      node.classList.add('cell_opened', `cell_count-mines_${minesAround}`);
+      node.innerHTML = minesAround;
 
-  #check(queue, structure, xx, yy) {
-    const x = Number(xx);
-    const y = Number(yy);
-    console.log(this.minesweeper.board);
-    console.log(this.minesweeper.board[x][y]);
+      this.minesweeper.board[`row${x}`][`cell${y}`].visited = true;
+      return;
+    }
+    setTimeout(() => {
+      if (x > 0) this.clickCell(structure, x - 1, y);
+      if (x < this.lines - 1) this.clickCell(structure, x + 1, y);
+      if (y > 0) this.clickCell(structure, x, y - 1);
+      if (y < this.lines - 1) this.clickCell(structure, x, y + 1);
 
-    // if (!queue.includes([x, y])) {
-    //   queue.push([x, y]);
-    // }
-    // if (this.minesweeper.board[x][y] !== 9 && this.minesweeper.board[x][y] !== 0) {
-    //   console.log('цифра');
-    //   return queue;
-    // }
-    // this.#check(queue, structure, x - 1, y - 1);
-    // this.#check(queue, structure, x, y - 1);
-    // this.#check(queue, structure, x + 1, y - 1);
-    // this.#check(queue, structure, x - 1, y);
-    // this.#check(queue, structure, x - 1, y + 1);
+      if (x > 0 && y > 0) this.clickCell(structure, x - 1, y - 1);
+      if (x < this.lines - 1 && y < this.lines - 1) this.clickCell(structure, x + 1, y + 1);
 
-    // this.#check(queue, structure, x, y + 1);
-    // this.#check(queue, structure, x + 1, y);
-    // this.#check(queue, structure, x + 1, y + 1);
+      if (y > 0 && x < this.lines - 1) this.clickCell(structure, x + 1, y - 1);
+      if (x > 0 && y < this.lines - 1) this.clickCell(structure, x - 1, y + 1);
+    }, 10);
   }
 
   #getMineInCell(x, y) {
-    return this.minesweeper.board[x][y] === 9 ? 1 : 0;
+    return this.minesweeper.board[`row${x}`][`cell${y}`].mine ? 1 : 0;
   }
 
-  #getCompletedBoard() {
-    for (let i = 0; i < this.lines; i += 1) {
-      this.minesweeper.board.push([]);
-      for (let j = 0; j < this.lines; j += 1) {
-        if (this.minesweeper.mines.includes(`${i}-${j}`)) this.minesweeper.board[i].push(9);
-        else this.minesweeper.board[i].push(0);
+  #addInfoAboutMinesToCells() {
+    for (let x = 0; x < this.lines; x += 1) {
+      for (let y = 0; y < this.lines; y += 1) {
+        if (this.minesweeper.mines.includes(`${x}-${y}`)) this.minesweeper.board[`row${x}`][`cell${y}`].mine = true;
+        else this.minesweeper.board[`row${x}`][`cell${y}`].minesAround = 0;
       }
     }
 
@@ -195,45 +134,42 @@ export default class Minesweeper {
 
         const mines = topLeft + top + topRight + left + right + botLeft + bottom + botRight;
 
-        if (this.minesweeper.board[x][y] !== 9) this.minesweeper.board[x][y] = mines;
+        if (!this.minesweeper.board[`row${x}`][`cell${y}`].mine) this.minesweeper.board[`row${x}`][`cell${y}`].minesAround = mines;
       }
     }
-
-    return this.minesweeper.board;
   }
 
   getMines() {
     for (let i = 0; i < this.minesweeper.countMines; i += 1) {
-      // const index = this.#getPairIndexes(); // раскомментировать
-      // this.mines.push(index); // раскомментировать
+      const index = this.#getPairIndexes();
 
-      // test arr
-      //   [2, 9, 1, 0, 0, 0, 0],
-      //   [9, 2, 1, 0, 0, 0, 0],
-      //   [1, 1, 0, 0, 0, 0, 0],
-      //   [0, 0, 0, 0, 0, 1, 1],
-      //   [0, 0, 1, 1, 1, 1, 9],
-      //   [0, 0, 1, 9, 1, 2, 2],
-      //   [0, 0, 1, 1, 1, 1, 9],
+      this.minesweeper.mines.push(index);
     }
-    this.minesweeper.mines.push('0-1'); // удалить после тестов
-    this.minesweeper.mines.push('1-0'); // удалить после тестов
-    this.minesweeper.mines.push('4-6'); // удалить после тестов
-    this.minesweeper.mines.push('5-3'); // удалить после тестов
-    this.minesweeper.mines.push('6-6'); // удалить после тестов
 
-    this.#getCompletedBoard();
+    this.#addInfoAboutMinesToCells();
+
     return this.minesweeper.mines;
   }
 
   replaceMine(index) {
-    this.minesweeper.mines[index] = this.#getPairIndexes();
+    const [oldMineX, oldMineY] = convertPositionToArr(this.minesweeper.mines[index]);
+
+    this.minesweeper.board[`row${oldMineX}`][`cell${oldMineY}`].mine = false;
+
+    const newMinePosition = this.#getPairIndexes();
+    const [newMineX, newMineY] = convertPositionToArr(newMinePosition);
+
+    this.minesweeper.board[`row${newMineX}`][`cell${newMineY}`].mine = true;
+
+    this.minesweeper.mines[index] = newMinePosition;
+
+    this.#addInfoAboutMinesToCells();
   }
 
   #getPairIndexes() {
-    const i = randomIndex(this.lines);
-    const j = randomIndex(this.lines);
-    const index = `${i}-${j}`;
+    const x = Number(randomIndex(this.lines));
+    const y = Number(randomIndex(this.lines));
+    const index = `${x}-${y}`;
 
     if (this.minesweeper.mines.includes(index)) return this.#getPairIndexes();
 

@@ -191,6 +191,9 @@ body {
   background-color: rgb(148, 102, 185);
   border-right: 1px solid black;
   border-bottom: 1px solid black;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
 }
 .cell:first-child {
   border-left: 1px solid black;
