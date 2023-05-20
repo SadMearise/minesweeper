@@ -1,5 +1,4 @@
-import BaseComponent from './BaseComponent.js';
-import { randomIndex, convertPositionToArr, initDOM } from '../files/functions.js';
+import { randomIndex, convertPositionToArr } from '../files/functions.js';
 
 export default class Minesweeper {
   constructor({ countMines = 0, difficult = 'easy' } = {}) {
@@ -21,18 +20,18 @@ export default class Minesweeper {
 
   // возможно нужно перенести в App
   getStructure() {
-    const structure = {};
+    const structure = document.createDocumentFragment();
 
     for (let x = 0; x < this.lines; x += 1) {
-      const row = new BaseComponent({ classNames: ['board__row'] });
+      const row = document.createElement('div');
+      row.classList.add('board__row');
 
-      structure[`row${x}`] = { component: row };
-      this.minesweeper.board[`row${x}`] = {};
       for (let y = 0; y < this.lines; y += 1) {
-        const cell = new BaseComponent({ classNames: ['board__cell', 'cell'], attributes: { 'data-pos': `${x}-${y}` } });
+        const cell = document.createElement('div');
+        cell.classList.add('board__cell', 'cell');
+        row.append(cell);
 
-        structure[`row${x}`][`cell${y}`] = { component: cell };
-
+        console.log(this.minesweeper.board);
         this.minesweeper.board[`row${x}`][`cell${y}`] = {
           flag: false,
           mine: false,
@@ -40,6 +39,8 @@ export default class Minesweeper {
           minesAround: false,
         };
       }
+
+      structure.append(row);
     }
 
     return structure;
@@ -57,6 +58,7 @@ export default class Minesweeper {
     }
 
     this.#addInfoAboutMinesToCells();
+
     return this.minesweeper.mines;
   }
 
@@ -182,6 +184,9 @@ export default class Minesweeper {
   }
 
   #addInfoAboutMinesToCells() {
+    console.log(this.minesweeper.mines);
+    console.log(this.minesweeper.board);
+    console.log(this.minesweeper.board[`row${0}`]);
     for (let x = 0; x < this.lines; x += 1) {
       for (let y = 0; y < this.lines; y += 1) {
         if (this.minesweeper.mines.includes(`${x}-${y}`)) this.minesweeper.board[`row${x}`][`cell${y}`].mine = true;
