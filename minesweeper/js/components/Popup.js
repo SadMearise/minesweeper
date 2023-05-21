@@ -1,13 +1,21 @@
+import Sound from './Sound.js';
+
 export default class Popup {
-  static open(currentPopup) {
+  static open(currentPopup, sound = false) {
     if (currentPopup) {
       document.body.classList.add('lock');
       currentPopup.classList.add('open');
 
-      currentPopup.addEventListener('click', (event) => {
-        if (!event.target.closest('.popup__content')) {
-          Popup.close(event.target.closest('.popup'));
-        }
+      const popupCloseButtons = document.querySelectorAll('.close-popup');
+
+      popupCloseButtons.forEach((btn) => {
+        btn.addEventListener('click', (event) => {
+          const popup = event.target.closest('.popup');
+
+          if (sound) sound.off();
+          Popup.close(popup);
+          popup.remove();
+        });
       });
     }
   }

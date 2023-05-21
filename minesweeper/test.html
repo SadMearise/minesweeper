@@ -1,115 +1,120 @@
-<div class="page">
-  <header class="header container">
-    <div class="header__body">
-      <div class="header__control-panel">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-          data-bs-target="#exampleModal">Leaderboard</button>
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Leaderboard</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body leaderboard-list">
-                <div class="leaderboard-list__item">
-                  <span class="leaderboard-list__nickname">nikes01</span>
-                  <span class="leaderboard-list__score">654</span>
-                </div>
-                <div class="leaderboard-list__item">
-                  <span class="leaderboard-list__nickname">nikes01</span>
-                  <span class="leaderboard-list__score">654</span>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              </div>
-            </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div class="page">
+    <header class="header container">
+      <div class="header__body">
+        <div class="header__control-panel">
+          <button class="btn">Leaderboard</button>
+          <div class="switch">
+            <input id="switch-theme" type="checkbox" class="switch__input">
+            <label for="switch-theme" class="switch__label"></label>
           </div>
         </div>
-
-        <div class="switch">
-          <input id="switch-theme" type="checkbox" class="switch__input">
-          <label for="switch-theme" class="switch__label"></label>
+      </div>
+    </header>
+    <main class="main container">
+      <div class="app">
+        <div class="app__col">
+          <h1 class="app__title">Minesweeper</h1>
+          <p class="app__description">Minesweeper is single-player logic-based computer game played on rectangular board
+            whose object is to locate a predetermined number of randomly-placed "mines" in the shortest possible time by
+            clicking on "safe" squares while avoiding the squares with mines. If the player clicks on a mine, the game
+            ends. Otherwise, a number between 0 and 8 is displayed that identifies the total number of mines present in
+            the eight neighboring squares. Therefore, finding a square containing "8" indicated that all eight adjacent
+            squares contain mines, while if a zero (displayed as a blank) is uncovered, there are no mines in the
+            surrounding squares. A square suspected of containing a mine may be marked with flag.</p>
+        </div>
+        <div class="app__col">
+          <div class="app__minesweeper minesweeper">
+            <div class="minesweeper__header options">
+              <div class="options__counter counter counter_steps">
+                <span class="counter__text">999</span>
+                <img src="./img/steps.svg" alt="steps" class="counter__icon">
+              </div>
+              <div class="options__difficult-menu difficult-menu">
+                <select name="difficult-menu" class="difficult-menu__select">
+                  <option value="Easy" class="difficult-menu__option">Easy</option>
+                  <option value="Medium" class="difficult-menu__option">Medium</option>
+                  <option value="Hard" class="difficult-menu__option">Hard</option>
+                </select>
+              </div>
+              <button class="options__custom-button btn">Custom</button>
+              <div class="options__counter counter counter_timer">
+                <img src="./img/timer.svg" alt="timer" class="counter__icon">
+                <span class="counter__text">999</span>
+              </div>
+            </div>
+            <div class="minesweeper__stats options">
+              <div class="options__counter counter counter_mines">
+                <span class="counter__text">99</span>
+                <img src="./img/mine.svg" alt="steps" class="counter__icon">
+              </div>
+              <div class="options__counter counter counter_flags">
+                <img src="./img/flag.svg" alt="steps" class="counter__icon">
+                <span class="counter__text">99</span>
+              </div>
+            </div>
+            <div class="minesweeper__board board">
+              <div class="board__row">
+                <div class="board__cell cell"></div>
+                <div class="board__cell cell cell_flag"></div>
+                <div class="board__cell cell cell_mine"></div>
+                <div class="board__cell cell cell_opened"></div>
+                <div class="board__cell cell cell_opened cell_count-mines_1">1</div>
+                <div class="board__cell cell cell_opened cell_count-mines_2">2</div>
+                <div class="board__cell cell cell_opened cell_count-mines_3">3</div>
+                <div class="board__cell cell cell_opened cell_count-mines_4">4</div>
+                <div class="board__cell cell cell_opened cell_count-mines_5">5</div>
+                <div class="board__cell cell cell_opened cell_count-mines_6">6</div>
+                <!-- <div class="board__cell cell cell_opened cell_count-mines_7">7</div>
+                <div class="board__cell cell cell_opened cell_count-mines_8">8</div> -->
+              </div>
+            </div>
+            <button class="minesweeper__button btn">New game</button>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer class="footer container">
+      <span class="footer__copy">© SadMearise</span>
+    </footer>
+  </div>
+  <div id="popup" class="popup">
+    <div class="popup__body">
+      <div class="popup__wrapper">          
+        <div class="popup__content">
+          <h3 class="popup__title">title</h3>
+          <div class="leaderboard-list">
+            <div class="leaderboard-list__item">
+              <span class="leaderboard-list__text">1</span>
+              <span class="leaderboard-list__text">172</span>
+              <span class="leaderboard-list__text">4</span>
+            </div>
+            <div class="leaderboard-list__item">
+              <span class="leaderboard-list__text">2</span>
+              <span class="leaderboard-list__text">172</span>
+              <span class="leaderboard-list__text">3</span>
+            </div>
+          </div>
+          <p class="popup__text">texttexttext</p>
+          <div class="field">
+            <label class="field__label">Mines:</label>
+            <input type="number" max="99" min="1" maxlength="2" class="field__input">
+          </div>
+          <div class="popup__row">
+            <button class="popup__button btn btn_save">Save</button>
+            <button class="popup__button btn btn_close close-popup">Close</button>
+          </div>
         </div>
       </div>
     </div>
-  </header>
-  <main class="main container">
-    <div class="app">
-      <div class="app__col">
-        <h1 class="app__title">Minesweeper</h1>
-        <p class="app__description">Minesweeper is single-player logic-based computer game played on rectangular board
-          whose object is to locate a predetermined number of randomly-placed "mines" in the shortest possible time by
-          clicking on "safe" squares while avoiding the squares with mines. If the player clicks on a mine, the game
-          ends. Otherwise, a number between 0 and 8 is displayed that identifies the total number of mines present in
-          the eight neighboring squares. Therefore, finding a square containing "8" indicated that all eight adjacent
-          squares contain mines, while if a zero (displayed as a blank) is uncovered, there are no mines in the
-          surrounding squares. A square suspected of containing a mine may be marked with flag.</p>
-      </div>
-      <div class="app__col">
-        <div class="app__minesweeper minesweeper">
-          <div class="minesweeper__header options">
-            <div class="options__counter counter counter_steps">999</div>
-            <div class="options__difficult-menu difficult-menu">
-              <select name="difficult-menu" class="difficult-menu__select">
-                <option value="Easy" class="difficult-menu__option">Easy</option>
-                <option value="Medium" class="difficult-menu__option">Medium</option>
-                <option value="Hard" class="difficult-menu__option">Hard</option>
-              </select>
-            </div>
-            <div class="options__custom">
-              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Custom
-                mines</button>
-              <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h1 class="modal-title fs-5" id="exampleModalLabel">Leaderboard</h1>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body leaderboard-list">
-                      <div class="leaderboard-list__item">
-                        <span class="leaderboard-list__nickname">nikes01</span>
-                        <span class="leaderboard-list__score">654</span>
-                      </div>
-                      <div class="leaderboard-list__item">
-                        <span class="leaderboard-list__nickname">nikes01</span>
-                        <span class="leaderboard-list__score">654</span>
-                      </div>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="options__counter counter counter_timer">99:99</div>
-          </div>
-          <div class="minesweeper__board board">
-            <div class="board__row">
-              <div class="board__cell cell"></div>
-              <div class="board__cell cell cell_flag"></div>
-              <div class="board__cell cell cell_mine"></div>
-              <div class="board__cell cell cell_opened"></div>
-              <div class="board__cell cell cell_opened cell_count-mines_1">1</div>
-              <div class="board__cell cell cell_opened cell_count-mines_2">2</div>
-              <div class="board__cell cell cell_opened cell_count-mines_3">3</div>
-              <div class="board__cell cell cell_opened cell_count-mines_4">4</div>
-              <div class="board__cell cell cell_opened cell_count-mines_5">5</div>
-              <div class="board__cell cell cell_opened cell_count-mines_6">6</div>
-              <div class="board__cell cell cell_opened cell_count-mines_7">7</div>
-              <div class="board__cell cell cell_opened cell_count-mines_8">8</div>
-            </div>
-          </div>
-          <button type="button" class="minesweeper__button btn btn-primary">New game</button>
-        </div>
-      </div>
-    </div>
-  </main>
-  <footer class="footer container">
-    <span class="footer__copy">© SadMearise</span>
-  </footer>
-</div>
+  </div>
+</body>
+</html>

@@ -99,6 +99,10 @@ q:before, q:after {
   content: none;
 }
 
+::-webkit-scrollbar {
+  width: 0;
+}
+
 body {
   color: #fff;
   background-color: #666;
@@ -170,7 +174,7 @@ body.lock {
 }
 
 .minesweeper {
-  width: 70%;
+  min-width: 70%;
   display: flex;
   flex-direction: column;
 }
@@ -421,6 +425,6 @@ body.lock {
   justify-content: flex-end;
   gap: 10px;
 }
-.light {
+.theme_light {
   background-color: #fff;
 }

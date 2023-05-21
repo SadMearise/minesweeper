@@ -1,178 +1,182 @@
 import App from './components/App.js';
 import Minesweeper from './components/Minesweeper.js';
 import LocalStorage from './components/LocalStorage.js';
-// import Popup from './components/Popup.js';
-// import { initDOM, convertPositionToArr } from './files/functions.js';
+import Popup from './components/Popup.js';
+import Sound from './components/Sound.js';
+import { convertPositionToArr } from './files/functions.js';
 
 let minesweeperData = LocalStorage.checkLocalStorage('minesweeper');
 
 minesweeperData = minesweeperData ? LocalStorage.getLocalStorage('minesweeper') : {};
 
-const app = App.getStructure();
-document.body.prepend(app);
+const app = new App();
+let minesweeper = new Minesweeper(minesweeperData);
 
-const minesweeper = new Minesweeper(minesweeperData);
-const minesweeperStructure = minesweeper.getStructure();
+const minesweeperObj = minesweeper.getMinesweeperObj();
+const appStructure = app.getStructure(minesweeperObj.countMines);
+document.body.append(appStructure);
+console.log('start', minesweeperObj); //
+LocalStorage.setLocalStorage('minesweeper', minesweeperObj); //
+console.log('start', minesweeperObj); //
+
+let minesweeperStructure = minesweeper.getStructure();
 const board = document.querySelector('.board');
 board.append(minesweeperStructure);
 
+const stepsNode = document.querySelector('.counter_steps .counter__text');
+const timerNode = document.querySelector('.counter_timer .counter__text');
+
+let minesArr = minesweeper.getMines();
 board.addEventListener('click', (event) => {
-  console.log(event);
-  const minesArr = minesweeper.getMines();
-  console.log(minesArr);
-  // const timerComponent = minesweeperElement.options.counterTimer.text.component;
-  // const stepCounterComponent = minesweeperElement.options.counterSteps.text.component;
-  // const { target } = event;
-  // const cellPos = target.dataset.pos;
-  // const [x, y] = convertPositionToArr(cellPos);
+  if (minesweeperObj.gameStatus !== 'active') return;
 
-  // // добавить проверку на visited ячейку
-  // minesweeper.stepCounter(stepCounterComponent);
-  // if (!timerEnabled) {
-  //   timerEnabled = true;
-  //   timer = window.setInterval(() => { minesweeper.startTimer(timerComponent); }, 1000);
-  // }
+  const { target } = event;
 
-  // if (minesArr.includes(cellPos)) {
-  //   if (firstClick) {
-  //     const index = minesArr.indexOf(cellPos);
+  if (!target.classList.contains('cell')) return;
+  if (target.classList.contains('cell_flag')) return;
 
-  //     firstClick = false;
+  const cellPos = target.dataset.pos;
+  const [x, y] = convertPositionToArr(cellPos);
 
-  //     minesweeper.replaceMine(index);
-  //     minesweeper.checkCells(minesweeperStructure, x, y);
-  //   } else {
-  //     minesweeperStructure[`row${x}`][`cell${y}`].component.getNode().classList.add('cell_mine');
-  //     Minesweeper.endGame('mine', timer);
-  //   }
-  // } else {
-  //   firstClick = false;
-  //   minesweeper.checkCells(minesweeperStructure, x, y);
-  // }
+  if (!minesweeperObj.board[`row${x}`][`cell${y}`].visited) minesweeper.stepCounter(stepsNode);
+  if (!minesweeperObj.interval) {
+    minesweeper.setMinesweeperValue = {
+      interval: window.setInterval(() => {
+        minesweeper.startTimer(timerNode);
+        LocalStorage.setLocalStorage('minesweeper', minesweeperObj); //
+      }, 1000),
+    };
+  }
+
+  const cellNode = document.querySelector(`.cell[data-pos="${x}-${y}"]`);
+  if (minesArr.includes(cellPos)) {
+    if (minesweeperObj.firstClick) {
+      const index = minesArr.indexOf(cellPos);
+
+      minesweeperObj.firstClick = false;
+
+      minesArr = minesweeper.getReplacedMines(index);
+      minesweeper.checkCells(cellNode, x, y);
+    } else {
+      target.classList.add('cell_mine');
+      minesweeper.endGame('mine');
+    }
+  } else {
+    minesweeperObj.firstClick = false;
+    minesweeper.checkCells(cellNode, x, y);
+  }
+
+  LocalStorage.setLocalStorage('minesweeper', minesweeperObj); //
 });
 
+board.addEventListener('contextmenu', (event) => {
+  event.preventDefault();
+  if (minesweeperObj.gameStatus !== 'active') return;
 
+  const { target } = event;
+  const [x, y] = convertPositionToArr(target.dataset.pos);
+  const { flag, visited } = minesweeperObj.board[`row${x}`][`cell${y}`];
 
+  if (visited) return;
 
+  const sound = new Sound();
+  sound.musicPath = '/minesweeper/assets/flagged.mp3';
+  sound.on();
 
+  if (flag) {
+    minesweeperObj.board[`row${x}`][`cell${y}`].flag = false;
+    target.classList.remove('cell_flag');
+    minesweeper.flagsCounter(false);
+  } else {
+    minesweeperObj.board[`row${x}`][`cell${y}`].flag = true;
+    target.classList.add('cell_flag');
+    minesweeper.flagsCounter();
+  }
 
+  LocalStorage.setLocalStorage('minesweeper', minesweeperObj); //
+});
 
+const minesweeperNewGameButton = document.querySelector('.minesweeper__button');
 
+minesweeperNewGameButton.addEventListener('click', () => {
+  const newMinesArr = minesweeper.newGame(board, stepsNode, timerNode);
+  minesArr = newMinesArr;
 
+  LocalStorage.setLocalStorage('minesweeper', minesweeperObj); //
+});
 
+const difficultMenu = document.querySelector('.difficult-menu__select');
 
+difficultMenu.addEventListener('change', function select() {
+  minesweeper = new Minesweeper({ difficult: this.value.toLowerCase() });
 
+  minesweeperStructure = minesweeper.getStructure();
 
+  const newMinesArr = minesweeper.newGame(board, stepsNode, timerNode);
+  minesArr = newMinesArr;
 
+  LocalStorage.setLocalStorage('minesweeper', minesweeperObj); //
+});
 
+const customButton = document.getElementById('custom-button');
 
+customButton.addEventListener('click', () => {
+  const popup = App.getPopup('Custom', 'Options', false, true, true);
 
+  document.body.append(popup);
 
+  const elementhWithMaxLength = document.querySelectorAll('[maxlength]');
 
+  elementhWithMaxLength.forEach((el) => {
+    el.addEventListener('input', function s() {
+      this.value = this.value.substr(0, el.getAttribute('maxlength'));
+    });
+  });
 
-// const app = new App();
-// const appStructure = app.getStructure();
-// const { page } = appStructure;
-// const pageDOM = Object.assign(Object.create(Object.getPrototypeOf(page.component)), page.component);
-// console.log(appStructure);
-// const minesweeperElement = page.main.app.col2.minesweeper;
-// const boardComponent = minesweeperElement.board.component;
-// const newGameButtonComponent = minesweeperElement.button.component;
-// const leaderboardButtonComponent = page.header.body.controlPanel.btn.component;
+  const popupNode = document.getElementById('popupCustom');
+  Popup.open(popupNode);
 
-// const minesweeper = new Minesweeper(minesweeperData);
-// const minesweeperStructure = minesweeper.getStructure();
-// console.log(minesweeperElement);
-// const keys = Object.keys(minesweeperStructure);
-// for (let i = 0; i < keys.length; i += 1) {
-//   minesweeperElement.board[`row${i}`] = minesweeperStructure[`row${i}`];
-// }
-// initDOM(page, pageDOM);
-// document.body.prepend(pageDOM.getNode());
+  const popupSaveButton = document.querySelector('.popup .btn_save');
 
-// let firstClick = true;
-// let timerEnabled = false;
-// let timer;
+  popupSaveButton.addEventListener('click', () => {
+    const input = document.querySelector('.popup .field__input');
 
-// appStructure.page.main.app.col2.minesweeper.board.component.getNode().addEventListener('click', (event) => {
-// // boardComponent.getNode().addEventListener('click', (event) => {
-//   console.log(event);
-//   const minesArr = minesweeper.getMines();
-//   const timerComponent = minesweeperElement.options.counterTimer.text.component;
-//   const stepCounterComponent = minesweeperElement.options.counterSteps.text.component;
-//   const { target } = event;
-//   const cellPos = target.dataset.pos;
-//   const [x, y] = convertPositionToArr(cellPos);
+    minesweeper.setMinesweeperValue = { countMines: input.value };
+    const newMinesArr = minesweeper.newGame(board, stepsNode, timerNode);
+    minesArr = newMinesArr;
+  });
 
-//   // добавить проверку на visited ячейку
-//   minesweeper.stepCounter(stepCounterComponent);
-//   if (!timerEnabled) {
-//     timerEnabled = true;
-//     timer = window.setInterval(() => { minesweeper.startTimer(timerComponent); }, 1000);
-//   }
+  LocalStorage.setLocalStorage('minesweeper', minesweeperObj); //
+});
 
-//   if (minesArr.includes(cellPos)) {
-//     if (firstClick) {
-//       const index = minesArr.indexOf(cellPos);
+const leaderboardButton = document.getElementById('leaderboard');
 
-//       firstClick = false;
+leaderboardButton.addEventListener('click', () => {
+  const popup = App.getPopup('Leaderboard', 'Last results', false, false, false, minesweeperObj.leaderboard);
 
-//       minesweeper.replaceMine(index);
-//       minesweeper.checkCells(minesweeperStructure, x, y);
-//     } else {
-//       minesweeperStructure[`row${x}`][`cell${y}`].component.getNode().classList.add('cell_mine');
-//       Minesweeper.endGame('mine', timer);
-//     }
-//   } else {
-//     firstClick = false;
-//     minesweeper.checkCells(minesweeperStructure, x, y);
-//   }
-// });
+  document.body.append(popup);
 
-// boardComponent.getNode().addEventListener('contextmenu', (event) => {
-//   event.preventDefault();
+  const popupNode = document.getElementById('popupLeaderboard');
+  Popup.open(popupNode);
 
-//   const { target } = event;
-//   const [x, y] = convertPositionToArr(target.dataset.pos);
-//   const minesweeperObj = minesweeper.getMinesweeperObj();
-//   const { flag, visited } = minesweeperObj.board[`row${x}`][`cell${y}`];
+  LocalStorage.setLocalStorage('minesweeper', minesweeperObj); //
+});
 
-//   if (visited) return;
+const switchNode = document.getElementById('switch-theme');
+const checkTheme = LocalStorage.checkLocalStorage('theme');
+const theme = checkTheme ? LocalStorage.getLocalStorage('theme') : 'default';
 
-//   if (flag) {
-//     minesweeperObj.board[`row${x}`][`cell${y}`].flag = false;
-//     minesweeperStructure[`row${x}`][`cell${y}`].component.getNode().classList.remove('cell_flag');
-//   } else {
-//     minesweeperObj.board[`row${x}`][`cell${y}`].flag = true;
-//     minesweeperStructure[`row${x}`][`cell${y}`].component.getNode().classList.add('cell_flag');
-//   }
-// });
+if (theme === 'light') {
+  document.body.classList.add('theme', 'theme_light');
+  switchNode.checked = true;
+}
 
-// // difficultMenuComponent.getNode().addEventListener('change', () => {
-// //   console.log(this.value);
-// // });
-
-// newGameButtonComponent.getNode().addEventListener('click', () => {
-//   boardComponent.destroy();
-//   delete minesweeperElement.board;
-
-//   const newStructure = minesweeper.newGame();
-//   const mKeys = Object.keys(newStructure);
-//   minesweeperElement.board = { component: App.getBoard() };
-//   for (let i = 0; i < mKeys.length; i += 1) {
-//     minesweeperElement.board[`row${i}`] = newStructure[`row${i}`];
-//   }
-//   initDOM(newStructure, minesweeperElement.board.component);
-//   minesweeperElement.options.component.after(minesweeperElement.board.component);
-//   console.log(appStructure.page.main.app.col2.minesweeper.board);
-// });
-
-// leaderboardButtonComponent.getNode().addEventListener('click', () => {
-//   const leaderboardPopupStructure = app.getPopupStructure({ id: 1 }); // сюда будем передавать только что сформированный обновлённый объект
-//   leaderboardPopupStructure.popup.component.destroy();
-//   initDOM(leaderboardPopupStructure, pageDOM);
-//   Popup.open(leaderboardPopupStructure.popup.component.getNode());
-// });
-
-// // подумать на счёт передачи отмены передачи minesweeperStructure в функции и
-// // вместо этого получать структуру в самих методах
+switchNode.addEventListener('click', (event) => {
+  if (event.target.checked) {
+    LocalStorage.setLocalStorage('theme', 'light');
+    document.body.classList.add('theme', 'theme_light');
+  } else {
+    LocalStorage.setLocalStorage('theme', 'default');
+    document.body.classList.remove('theme', 'theme_light');
+  }
+});

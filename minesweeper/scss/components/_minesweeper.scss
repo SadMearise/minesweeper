@@ -1,5 +1,5 @@
 .minesweeper {
-  width: 70%;
+  min-width: 70%;
   display: flex;
   flex-direction: column;
   &__header {
