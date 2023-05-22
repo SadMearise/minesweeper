@@ -13,12 +13,17 @@ export default class App {
     page.classList.add('page');
 
     const header = document.createElement('header');
-    header.classList.add('header', 'container');
+    header.classList.add('header');
     page.append(header);
 
     const headerBody = document.createElement('div');
-    headerBody.classList.add('header__body');
+    headerBody.classList.add('header__body', 'container');
     header.append(headerBody);
+
+    const headerTitle = document.createElement('h1');
+    headerTitle.classList.add('header__title');
+    headerTitle.innerText = 'Minesweeper';
+    headerBody.append(headerTitle);
 
     const headerControlPanel = document.createElement('div');
     headerControlPanel.classList.add('header__control-panel');
@@ -53,27 +58,9 @@ export default class App {
     app.classList.add('app');
     main.append(app);
 
-    const col1 = document.createElement('div');
-    col1.classList.add('app__col');
-    app.append(col1);
-
-    const appTitle = document.createElement('h1');
-    appTitle.classList.add('app__title');
-    appTitle.innerText = 'Minesweeper';
-    col1.append(appTitle);
-
-    const appDescription = document.createElement('p');
-    appDescription.classList.add('app__description');
-    appDescription.innerText = 'Minesweeper is single-player logic-based computer game played on rectangular board whose object is to locate a predetermined number of randomly-placed "mines" in the shortest possible time by clicking on "safe" squares while avoiding the squares with mines. If the player clicks on a mine, the game ends. Otherwise, a number between 0 and 8 is displayed that identifies the total number of mines present in the eight neighboring squares. Therefore, finding a square containing "8" indicated that all eight adjacent squares contain mines, while if a zero (displayed as a blank) is uncovered, there are no mines in the surrounding squares. A square suspected of containing a mine may be marked with flag.';
-    col1.append(appDescription);
-
-    const col2 = document.createElement('div');
-    col2.classList.add('app__col');
-    app.append(col2);
-
     const minesweeper = document.createElement('div');
     minesweeper.classList.add('app__minesweeper', 'minesweeper');
-    col2.append(minesweeper);
+    app.append(minesweeper);
 
     const minesweeperOptions = document.createElement('div');
     minesweeperOptions.classList.add('minesweeper__header', 'options');
@@ -233,12 +220,11 @@ export default class App {
     }
 
     if (leaderboard.length > 0) {
-      console.log(leaderboard);
       const keys = Object.keys(leaderboard);
       const keysLength = keys.length;
 
       const leaderboardList = document.createElement('div');
-      leaderboardList.classList.add('leaderboard-list');
+      leaderboardList.classList.add('popup__leaderboard', 'leaderboard-list');
       popupContent.append(leaderboardList);
 
       for (let i = 0; i < keysLength; i += 1) {
@@ -249,7 +235,10 @@ export default class App {
         for (let j = 0; j < 3; j += 1) {
           const leaderboardText = document.createElement('span');
           leaderboardText.classList.add('leaderboard-list__text');
-          leaderboardText.innerText = `${leaderboard[i][`item${j}`]}`;
+          let postfix = '';
+          if (j === 1) postfix = 's';
+          if (j === 2) postfix = ' moves';
+          leaderboardText.innerText = `${leaderboard[i][`item${j}`]}${postfix}`;
           leaderboardItem.append(leaderboardText);
         }
       }
@@ -276,9 +265,9 @@ export default class App {
       fieldInput.classList.add('field__input');
       fieldInput.setAttribute('type', 'number');
       fieldInput.setAttribute('max', '99');
-      fieldInput.setAttribute('min', '1');
+      fieldInput.setAttribute('min', '10');
       fieldInput.setAttribute('maxlength', '2');
-      fieldInput.setAttribute('value', '1');
+      fieldInput.setAttribute('value', '10');
       popupField.append(fieldInput);
     }
 

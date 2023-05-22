@@ -1,5 +1,3 @@
-import Sound from './Sound.js';
-
 export default class Popup {
   static open(currentPopup, sound = false) {
     if (currentPopup) {

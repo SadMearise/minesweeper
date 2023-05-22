@@ -1,8 +1,8 @@
 .options {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: 20px;
   &__item {
     flex: 0 1 25%;
   }

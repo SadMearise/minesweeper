@@ -1,17 +1,4 @@
 .app {
-  display: flex;
-  gap: 5%;
-  &__col {
-    flex: 0 1 50%;
-  }
-
-  &__title {
-  }
-
-  &__description {
-    text-align: justify;
-  }
-
   &__minesweeper {
     margin: 0 auto;
   }

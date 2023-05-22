@@ -1,11 +1,12 @@
 import { randomIndex, convertPositionToArr } from '../files/functions.js';
+import LocalStorage from './LocalStorage.js';
 import App from './App.js';
 import Popup from './Popup.js';
 import Sound from './Sound.js';
 
 export default class Minesweeper {
   constructor({
-    timer = 0, steps = 0, countMines = 0, difficult = 'easy', mines = [], board = {}, leaderboard = [], gameStatus = 'active', interval = false, firstClick = true, flags = 0,
+    timer = 0, steps = 0, countMines = 0, difficult = 'easy', mines = [], board = {}, leaderboard = [], gameStatus = 'active', interval = false, firstClick = true, flags = 0, currentBoard = {},
   } = {}) {
     this.minesweeper = {
       timer,
@@ -19,6 +20,7 @@ export default class Minesweeper {
       interval,
       firstClick,
       flags,
+      currentBoard,
     };
 
     if (this.minesweeper.difficult === 'easy') this.lines = 10;
@@ -31,28 +33,46 @@ export default class Minesweeper {
   set setMinesweeperValue(value) {
     if (value.countMines) this.minesweeper.countMines = value.countMines;
     if (value.interval) this.minesweeper.interval = value.interval;
+    if (value.difficult) {
+      this.minesweeper.difficult = value.difficult;
+      if (this.minesweeper.difficult === 'easy') this.lines = 10;
+      else if (this.minesweeper.difficult === 'medium') this.lines = 15;
+      else if (this.minesweeper.difficult === 'hard') this.lines = 25;
+    }
   }
 
-  getStructure() {
+  getStructure(lsState = false) {
     const structure = document.createDocumentFragment();
 
     for (let x = 0; x < this.lines; x += 1) {
       const row = document.createElement('div');
       row.classList.add('board__row');
 
-      this.minesweeper.board[`row${x}`] = {};
+      if (lsState === false) {
+        this.minesweeper.board[`row${x}`] = {};
+        this.minesweeper.currentBoard[`row${x}`] = {};
+      }
+
       for (let y = 0; y < this.lines; y += 1) {
         const cell = document.createElement('div');
         cell.classList.add('board__cell', 'cell');
         cell.setAttribute('data-pos', `${x}-${y}`);
         row.append(cell);
 
-        this.minesweeper.board[`row${x}`][`cell${y}`] = {
-          flag: false,
-          mine: false,
-          visited: false,
-          minesAround: false,
-        };
+        if (lsState === false) {
+          this.minesweeper.board[`row${x}`][`cell${y}`] = {
+            flag: false,
+            mine: false,
+            visited: false,
+            minesAround: false,
+          };
+
+          this.minesweeper.currentBoard[`row${x}`][`cell${y}`] = {
+            flag: false,
+            mine: false,
+            minesAround: false,
+          };
+        }
       }
 
       structure.append(row);
@@ -67,6 +87,7 @@ export default class Minesweeper {
 
   getMines() {
     this.minesweeper.mines = [];
+
     for (let i = 0; i < this.minesweeper.countMines; i += 1) {
       const index = this.#getPairIndexes();
       this.minesweeper.mines.push(index);
@@ -99,9 +120,16 @@ export default class Minesweeper {
 
     const node = document.querySelector(`.cell[data-pos="${x}-${y}"]`);
 
-    if (node.classList.contains('cell_flag')) node.classList.remove('cell_flag');
+    if (node.classList.contains('cell_flag')) {
+      this.displayUpdatedFlagsCounter(false);
+      node.classList.remove('cell_flag');
+
+      this.minesweeper.currentBoard[`row${x}`][`cell${y}`].flag = false;
+    }
 
     if (!mine && minesAround > 0) {
+      this.minesweeper.currentBoard[`row${x}`][`cell${y}`].minesAround = minesAround;
+
       this.minesweeper.board[`row${x}`][`cell${y}`].visited = true;
       node.classList.add('cell_opened', `cell_count-mines_${minesAround}`);
       node.innerHTML = minesAround;
@@ -121,12 +149,20 @@ export default class Minesweeper {
 
     if (minesAround === 0) {
       node.classList.add('cell_opened');
+
+      this.minesweeper.currentBoard[`row${x}`][`cell${y}`].minesAround = minesAround;
       this.minesweeper.board[`row${x}`][`cell${y}`].visited = true;
     } else if (minesAround > 0) {
-      if (node.classList.contains('cell_flag')) node.classList.remove('cell_flag');
+      if (node.classList.contains('cell_flag')) {
+        this.displayUpdatedFlagsCounter(false);
+        node.classList.remove('cell_flag');
+
+        this.minesweeper.currentBoard[`row${x}`][`cell${y}`].flag = false;
+      }
       node.classList.add('cell_opened', `cell_count-mines_${minesAround}`);
       node.innerHTML = minesAround;
 
+      this.minesweeper.currentBoard[`row${x}`][`cell${y}`].minesAround = minesAround;
       this.minesweeper.board[`row${x}`][`cell${y}`].visited = true;
       this.checkVictory();
       return;
@@ -144,6 +180,7 @@ export default class Minesweeper {
       if (y > 0 && x < this.lines - 1) this.clickCell(x + 1, y - 1);
       if (x > 0 && y < this.lines - 1) this.clickCell(x - 1, y + 1);
     }, 10);
+
     this.checkVictory();
   }
 
@@ -167,16 +204,9 @@ export default class Minesweeper {
     window.clearInterval(timer);
   }
 
-  resetTimer(timerComponent) {
-    const timerNode = timerComponent.getNode();
-
-    this.minesweeper.timer = 0;
-    timerNode.innerHTML = `00${this.minesweeper.timer}`;
-  }
-
-  flagsCounter(increase = true) {
+  displayUpdatedFlagsCounter(increase) {
     if (increase) this.minesweeper.flags += 1;
-    else this.minesweeper.flags -= 1;
+    else if (increase === false) this.minesweeper.flags -= 1;
 
     const flags = document.querySelector('.counter_flags .counter__text');
     const mines = document.querySelector('.counter_mines .counter__text');
@@ -227,9 +257,17 @@ export default class Minesweeper {
 
     this.minesweeper.mines.forEach((mine) => {
       const node = document.querySelector(`.cell[data-pos="${mine}"]`);
+      const [x, y] = convertPositionToArr(mine);
+
       if (!node.classList.contains('cell_mine')) {
-        if (node.classList.contains('cell_flag')) node.classList.remove('cell_flag');
+        if (node.classList.contains('cell_flag')) {
+          this.minesweeper.currentBoard[`row${x}`][`cell${y}`].flag = false;
+          node.classList.remove('cell_flag');
+        }
+
         node.classList.add('cell_mine');
+
+        this.minesweeper.currentBoard[`row${x}`][`cell${y}`].mine = true;
       }
     });
 
@@ -250,13 +288,16 @@ export default class Minesweeper {
       item1: this.minesweeper.timer,
       item2: this.minesweeper.steps,
     });
-    this.minesweeper.gameStatus = 'lose';
+    if (cause === 'win') this.minesweeper.gameStatus = 'win';
+    else this.minesweeper.gameStatus = 'lose';
+
+    LocalStorage.setLocalStorage('minesweeper', this.minesweeper);
   }
 
   newGame(board, stepsElement, timerElement) {
-    const boardRows = document.querySelectorAll('.board__row');
     const stepsNode = stepsElement;
     const timerNode = timerElement;
+    const boardRows = document.querySelectorAll('.board__row');
 
     boardRows.forEach((row) => row.remove());
 
@@ -266,7 +307,8 @@ export default class Minesweeper {
     this.minesweeper.steps = 0;
     this.minesweeper.flags = 0;
     this.minesweeper.mines = [];
-    this.minesweeper.board = [];
+    this.minesweeper.board = {};
+    this.minesweeper.currentBoard = {};
     this.minesweeper.gameStatus = 'active';
     this.minesweeper.firstClick = true;
     this.minesweeper.interval = false;
@@ -275,14 +317,18 @@ export default class Minesweeper {
     timerNode.innerText = '000';
 
     const structure = this.getStructure();
+
     const mines = this.getMines();
+
     const flagsNode = document.querySelector('.counter_flags .counter__text');
     const minesNode = document.querySelector('.counter_mines .counter__text');
-
+    
     flagsNode.innerText = this.minesweeper.flags;
     minesNode.innerText = this.minesweeper.countMines - this.minesweeper.flags;
 
     board.append(structure);
+
+    LocalStorage.setLocalStorage('minesweeper', this.minesweeper);
 
     return mines;
   }
@@ -326,7 +372,6 @@ export default class Minesweeper {
         if (!this.minesweeper.board[`row${x}`][`cell${y}`].mine) this.minesweeper.board[`row${x}`][`cell${y}`].minesAround = mines;
       }
     }
-    console.log('this.minesweeper.board', this.minesweeper.board);
   }
 
   #getPairIndexes() {

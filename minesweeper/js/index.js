@@ -10,23 +10,87 @@ let minesweeperData = LocalStorage.checkLocalStorage('minesweeper');
 minesweeperData = minesweeperData ? LocalStorage.getLocalStorage('minesweeper') : {};
 
 const app = new App();
-let minesweeper = new Minesweeper(minesweeperData);
+const minesweeper = new Minesweeper(minesweeperData);
 
 const minesweeperObj = minesweeper.getMinesweeperObj();
 const appStructure = app.getStructure(minesweeperObj.countMines);
-document.body.append(appStructure);
-console.log('start', minesweeperObj); //
-LocalStorage.setLocalStorage('minesweeper', minesweeperObj); //
-console.log('start', minesweeperObj); //
+document.body.prepend(appStructure);
 
-let minesweeperStructure = minesweeper.getStructure();
+const minesweeperStructure = minesweeper.getStructure(Object.keys(minesweeperData).length > 0);
+
 const board = document.querySelector('.board');
 board.append(minesweeperStructure);
+
+let minesArr = [];
+
+if (Object.keys(minesweeperData).length > 0) {
+  const stepsNode = document.querySelector('.counter_steps .counter__text');
+  const timerNode = document.querySelector('.counter_timer .counter__text');
+
+  const stepsLength = `${minesweeperObj.steps}`.length;
+
+  let text = '';
+  if (stepsLength === 1) text = '00';
+  if (stepsLength === 2) text = '0';
+
+  stepsNode.innerText = `${text}${minesweeperObj.steps}`;
+
+  const timerLength = `${minesweeperObj.timer}`.length;
+
+  let text2 = '';
+  if (timerLength === 1) text2 = '00';
+  if (timerLength === 2) text2 = '0';
+
+  timerNode.innerText = `${text2}${minesweeperObj.timer}`;
+
+  if (minesweeperObj.interval && minesweeperObj.gameStatus === 'active') {
+    minesweeper.setMinesweeperValue = {
+      interval: window.setInterval(() => {
+        minesweeper.startTimer(timerNode);
+        LocalStorage.setLocalStorage('minesweeper', minesweeperObj);
+      }, 1000),
+    };
+  }
+
+  minesweeper.displayUpdatedFlagsCounter();
+
+  const difficultMenu = document.querySelector('.difficult-menu__select');
+  difficultMenu.value = minesweeperObj.difficult[0].toUpperCase()
+  + minesweeperObj.difficult.slice(1);
+
+  const currentBoardLength = Object.keys(minesweeperObj.currentBoard).length;
+
+  for (let x = 0; x < currentBoardLength; x += 1) {
+    for (let y = 0; y < currentBoardLength; y += 1) {
+      const cell = document.querySelector(`[data-pos="${x}-${y}"]`);
+
+      if (minesweeperObj.currentBoard[`row${x}`][`cell${y}`].flag === true) {
+        cell.classList.add('cell_flag');
+      }
+      if (minesweeperObj.currentBoard[`row${x}`][`cell${y}`].mine === true) {
+        cell.classList.add('cell_mine');
+      }
+      if (minesweeperObj.currentBoard[`row${x}`][`cell${y}`].minesAround !== false) {
+        if (minesweeperObj.currentBoard[`row${x}`][`cell${y}`].minesAround > 0) {
+          cell.classList.add('cell_opened', `cell_count-mines_${minesweeperObj.currentBoard[`row${x}`][`cell${y}`].minesAround}`);
+          cell.innerText = minesweeperObj.currentBoard[`row${x}`][`cell${y}`].minesAround;
+        } else {
+          cell.classList.add('cell_opened');
+        }
+      }
+    }
+  }
+
+  minesArr.push(...minesweeperObj.mines);
+} else {
+  minesArr = minesweeper.getMines();
+}
+
+LocalStorage.setLocalStorage('minesweeper', minesweeperObj);
 
 const stepsNode = document.querySelector('.counter_steps .counter__text');
 const timerNode = document.querySelector('.counter_timer .counter__text');
 
-let minesArr = minesweeper.getMines();
 board.addEventListener('click', (event) => {
   if (minesweeperObj.gameStatus !== 'active') return;
 
@@ -43,12 +107,19 @@ board.addEventListener('click', (event) => {
     minesweeper.setMinesweeperValue = {
       interval: window.setInterval(() => {
         minesweeper.startTimer(timerNode);
-        LocalStorage.setLocalStorage('minesweeper', minesweeperObj); //
+        LocalStorage.setLocalStorage('minesweeper', minesweeperObj);
       }, 1000),
     };
   }
 
   const cellNode = document.querySelector(`.cell[data-pos="${x}-${y}"]`);
+
+  if (!target.classList.contains('cell_opened')) {
+    const sound = new Sound();
+    sound.musicPath = '/minesweeper/assets/open.mp3';
+    sound.on();
+  }
+
   if (minesArr.includes(cellPos)) {
     if (minesweeperObj.firstClick) {
       const index = minesArr.indexOf(cellPos);
@@ -59,6 +130,7 @@ board.addEventListener('click', (event) => {
       minesweeper.checkCells(cellNode, x, y);
     } else {
       target.classList.add('cell_mine');
+      minesweeperObj.currentBoard[`row${x}`][`cell${y}`].mine = true;
       minesweeper.endGame('mine');
     }
   } else {
@@ -66,7 +138,7 @@ board.addEventListener('click', (event) => {
     minesweeper.checkCells(cellNode, x, y);
   }
 
-  LocalStorage.setLocalStorage('minesweeper', minesweeperObj); //
+  LocalStorage.setLocalStorage('minesweeper', minesweeperObj);
 });
 
 board.addEventListener('contextmenu', (event) => {
@@ -86,14 +158,16 @@ board.addEventListener('contextmenu', (event) => {
   if (flag) {
     minesweeperObj.board[`row${x}`][`cell${y}`].flag = false;
     target.classList.remove('cell_flag');
-    minesweeper.flagsCounter(false);
+    minesweeperObj.currentBoard[`row${x}`][`cell${y}`].flag = false; // rewrite to 'set'
+    minesweeper.displayUpdatedFlagsCounter(false);
   } else {
     minesweeperObj.board[`row${x}`][`cell${y}`].flag = true;
     target.classList.add('cell_flag');
-    minesweeper.flagsCounter();
+    minesweeperObj.currentBoard[`row${x}`][`cell${y}`].flag = true; // rewrite to 'set'
+    minesweeper.displayUpdatedFlagsCounter(true);
   }
 
-  LocalStorage.setLocalStorage('minesweeper', minesweeperObj); //
+  LocalStorage.setLocalStorage('minesweeper', minesweeperObj);
 });
 
 const minesweeperNewGameButton = document.querySelector('.minesweeper__button');
@@ -102,20 +176,26 @@ minesweeperNewGameButton.addEventListener('click', () => {
   const newMinesArr = minesweeper.newGame(board, stepsNode, timerNode);
   minesArr = newMinesArr;
 
-  LocalStorage.setLocalStorage('minesweeper', minesweeperObj); //
+  LocalStorage.setLocalStorage('minesweeper', minesweeperObj);
 });
 
 const difficultMenu = document.querySelector('.difficult-menu__select');
 
 difficultMenu.addEventListener('change', function select() {
-  minesweeper = new Minesweeper({ difficult: this.value.toLowerCase() });
+  const value = this.value.toLowerCase();
 
-  minesweeperStructure = minesweeper.getStructure();
+  let mines;
+  if (value === 'easy') mines = 10;
+  else if (value === 'medium') mines = 15;
+  else if (value === 'hard') mines = 25;
+
+  minesweeper.setMinesweeperValue = { countMines: mines };
+  minesweeper.setMinesweeperValue = { difficult: value };
 
   const newMinesArr = minesweeper.newGame(board, stepsNode, timerNode);
   minesArr = newMinesArr;
 
-  LocalStorage.setLocalStorage('minesweeper', minesweeperObj); //
+  LocalStorage.setLocalStorage('minesweeper', minesweeperObj);
 });
 
 const customButton = document.getElementById('custom-button');
@@ -140,13 +220,18 @@ customButton.addEventListener('click', () => {
 
   popupSaveButton.addEventListener('click', () => {
     const input = document.querySelector('.popup .field__input');
+    let mines = 0;
 
-    minesweeper.setMinesweeperValue = { countMines: input.value };
+    if (input.value < 10) mines = 10;
+    else mines = input.value;
+
+    minesweeper.setMinesweeperValue = { countMines: mines };
+
     const newMinesArr = minesweeper.newGame(board, stepsNode, timerNode);
     minesArr = newMinesArr;
   });
 
-  LocalStorage.setLocalStorage('minesweeper', minesweeperObj); //
+  LocalStorage.setLocalStorage('minesweeper', minesweeperObj);
 });
 
 const leaderboardButton = document.getElementById('leaderboard');
@@ -154,12 +239,12 @@ const leaderboardButton = document.getElementById('leaderboard');
 leaderboardButton.addEventListener('click', () => {
   const popup = App.getPopup('Leaderboard', 'Last results', false, false, false, minesweeperObj.leaderboard);
 
-  document.body.append(popup);
+  document.body.prepend(popup);
 
   const popupNode = document.getElementById('popupLeaderboard');
   Popup.open(popupNode);
 
-  LocalStorage.setLocalStorage('minesweeper', minesweeperObj); //
+  LocalStorage.setLocalStorage('minesweeper', minesweeperObj);
 });
 
 const switchNode = document.getElementById('switch-theme');

@@ -44,7 +44,14 @@
     box-shadow: 0px 2px 35px 14px rgba(13, 13, 13, 0.04);
   }
 
-  &__title {}
+  &__title {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+
+  &__leaderboard {
+    margin-bottom: 15px;
+  }
 
   &__text {}
 
