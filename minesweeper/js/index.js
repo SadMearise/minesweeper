@@ -86,6 +86,36 @@ if (Object.keys(minesweeperData).length > 0) {
   minesArr = minesweeper.getMines();
 }
 
+const soundNode = document.getElementById('sound');
+const checkSound = LocalStorage.checkLocalStorage('sound');
+minesweeper.setMinesweeperValue = { sound: checkSound ? LocalStorage.getLocalStorage('sound') : 'off' };
+
+if (minesweeperObj.sound === 'on') {
+  soundNode.querySelector('.sound__img-btn').setAttribute('src', './img/on.png');
+  soundNode.dataset.state = 'on';
+} else {
+  soundNode.querySelector('.sound__img-btn').setAttribute('src', './img/off.png');
+  soundNode.dataset.state = 'off';
+}
+
+soundNode.addEventListener('click', () => {
+  const { state } = soundNode.dataset;
+
+  if (state === 'on') {
+    soundNode.querySelector('.sound__img-btn').setAttribute('src', './img/off.png');
+    soundNode.dataset.state = 'off';
+    minesweeper.setMinesweeperValue = { sound: 'off' };
+
+    LocalStorage.setLocalStorage('sound', 'off');
+  } else if (state === 'off') {
+    soundNode.querySelector('.sound__img-btn').setAttribute('src', './img/on.png');
+    soundNode.dataset.state = 'on';
+    minesweeper.setMinesweeperValue = { sound: 'on' };
+
+    LocalStorage.setLocalStorage('sound', 'on');
+  }
+});
+
 LocalStorage.setLocalStorage('minesweeper', minesweeperObj);
 
 const stepsNode = document.querySelector('.counter_steps .counter__text');
@@ -115,9 +145,11 @@ board.addEventListener('click', (event) => {
   const cellNode = document.querySelector(`.cell[data-pos="${x}-${y}"]`);
 
   if (!target.classList.contains('cell_opened')) {
-    const sound = new Sound();
-    sound.musicPath = '/minesweeper/assets/open.mp3';
-    sound.on();
+    if (minesweeperObj.sound === 'off') {
+      const sound = new Sound();
+      sound.musicPath = '/minesweeper/assets/open.mp3';
+      sound.on();
+    }
   }
 
   if (minesArr.includes(cellPos)) {
@@ -151,9 +183,11 @@ board.addEventListener('contextmenu', (event) => {
 
   if (visited) return;
 
-  const sound = new Sound();
-  sound.musicPath = '/minesweeper/assets/flagged.mp3';
-  sound.on();
+  if (minesweeperObj.sound === 'off') {
+    const sound = new Sound();
+    sound.musicPath = '/minesweeper/assets/flagged.mp3';
+    sound.on();
+  }
 
   if (flag) {
     minesweeperObj.board[`row${x}`][`cell${y}`].flag = false;

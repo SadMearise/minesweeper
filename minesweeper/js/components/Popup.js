@@ -10,7 +10,7 @@ export default class Popup {
         btn.addEventListener('click', (event) => {
           const popup = event.target.closest('.popup');
 
-          if (sound) sound.off();
+          if (sound !== false) sound.off();
           Popup.close(popup);
           popup.remove();
         });

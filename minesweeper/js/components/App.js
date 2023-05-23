@@ -6,7 +6,7 @@ export default class App {
     this.steps = steps;
   }
 
-  getStructure(mines, flags = 0) {
+  getStructure(mines, flags = 0, sound = 'off', soundState = 'off') {
     const structure = document.createDocumentFragment();
 
     const page = document.createElement('div');
@@ -28,6 +28,18 @@ export default class App {
     const headerControlPanel = document.createElement('div');
     headerControlPanel.classList.add('header__control-panel');
     headerBody.append(headerControlPanel);
+
+    const headerSound = document.createElement('div');
+    headerSound.classList.add('header__sound', 'sound');
+    headerSound.setAttribute('id', 'sound');
+    headerSound.setAttribute('data-state', `${soundState}`);
+    headerControlPanel.append(headerSound);
+
+    const soundImgBtn = document.createElement('img');
+    soundImgBtn.classList.add('sound__img-btn');
+    soundImgBtn.setAttribute('src', `./img/${sound}.png`);
+    soundImgBtn.setAttribute('alt', 'sound');
+    headerSound.append(soundImgBtn);
 
     const headerBtn = document.createElement('button');
     headerBtn.classList.add('btn');

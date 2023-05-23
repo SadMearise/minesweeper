@@ -6,7 +6,7 @@ import Sound from './Sound.js';
 
 export default class Minesweeper {
   constructor({
-    timer = 0, steps = 0, countMines = 0, difficult = 'easy', mines = [], board = {}, leaderboard = [], gameStatus = 'active', interval = false, firstClick = true, flags = 0, currentBoard = {},
+    timer = 0, steps = 0, countMines = 0, difficult = 'easy', mines = [], board = {}, leaderboard = [], gameStatus = 'active', interval = false, firstClick = true, flags = 0, currentBoard = {}, sound = 'off',
   } = {}) {
     this.minesweeper = {
       timer,
@@ -21,6 +21,7 @@ export default class Minesweeper {
       firstClick,
       flags,
       currentBoard,
+      sound,
     };
 
     if (this.minesweeper.difficult === 'easy') this.lines = 10;
@@ -33,6 +34,7 @@ export default class Minesweeper {
   set setMinesweeperValue(value) {
     if (value.countMines) this.minesweeper.countMines = value.countMines;
     if (value.interval) this.minesweeper.interval = value.interval;
+    if (value.sound) this.minesweeper.sound = value.sound;
     if (value.difficult) {
       this.minesweeper.difficult = value.difficult;
       if (this.minesweeper.difficult === 'easy') this.lines = 10;
@@ -212,7 +214,8 @@ export default class Minesweeper {
     const mines = document.querySelector('.counter_mines .counter__text');
 
     flags.innerText = this.minesweeper.flags;
-    mines.innerText = this.minesweeper.countMines - this.minesweeper.flags;
+    mines.innerText = (this.minesweeper.countMines
+      - this.minesweeper.flags) < 0 ? 0 : this.minesweeper.countMines - this.minesweeper.flags;
   }
 
   stepCounter(nodeElement) {
@@ -250,9 +253,14 @@ export default class Minesweeper {
       path = '/minesweeper/assets/win.mp3';
     }
 
-    const sound = new Sound();
-    sound.musicPath = path;
-    sound.on();
+    let sound = false;
+
+    if (this.minesweeper.sound === 'off') {
+      sound = new Sound();
+      sound.musicPath = path;
+      sound.on();
+    }
+
     document.body.prepend(popup);
 
     this.minesweeper.mines.forEach((mine) => {
@@ -322,7 +330,7 @@ export default class Minesweeper {
 
     const flagsNode = document.querySelector('.counter_flags .counter__text');
     const minesNode = document.querySelector('.counter_mines .counter__text');
-    
+
     flagsNode.innerText = this.minesweeper.flags;
     minesNode.innerText = this.minesweeper.countMines - this.minesweeper.flags;
 
